@@ -15,7 +15,7 @@ public class Flash : MonoBehaviour
 
     [Header("시야 제한")]
     public Vector2 yawLimit = new Vector2(-10, 70);   // 좌우 제한
-    public Vector2 pitchLimit = new Vector2(-30, 30); // 상하 제한
+    //public Vector2 pitchLimit = new Vector2(-30, 30); // 상하 제한
     public float deadzone = 0.4f;
 
     private Vector2 mouseDeadzone=Vector2.zero;
@@ -62,7 +62,7 @@ public class Flash : MonoBehaviour
         {
             mouseDeadzone.x = 0;
         }
-        if (Mathf.Abs(normalizedMouse.y) > deadzone)
+        /*if (Mathf.Abs(normalizedMouse.y) > deadzone)
         {
             mouseDeadzone.y = (normalizedMouse.y > 0) ?
                 (normalizedMouse.y - deadzone) : (normalizedMouse.y + deadzone);
@@ -70,15 +70,48 @@ public class Flash : MonoBehaviour
         else
         {
             mouseDeadzone.y = 0;
-        }
-            yaw += mouseDeadzone.x * cameraSpeed * Time.deltaTime;
-        pitch-=mouseDeadzone.y * cameraSpeed * Time.deltaTime;
+        }*/
+        yaw += mouseDeadzone.x * cameraSpeed * Time.deltaTime;
+        //pitch-=mouseDeadzone.y * cameraSpeed * Time.deltaTime;
 
         yaw=Mathf.Clamp(yaw, yawLimit.x, yawLimit.y);
-        pitch = Mathf.Clamp(pitch, pitchLimit.x, pitchLimit.y);
+        //pitch = Mathf.Clamp(pitch, pitchLimit.x, pitchLimit.y);
 
         playerCamera.rotation = Quaternion.Euler(pitch, yaw, 0);
         RotateFlashlightToMouse();
+        if (isFlashlightOn)
+        {
+            
+            CheckForMonsters();
+        }
+    }
+    void CheckForMonsters()
+    {
+        // 손전등의 현재 방향으로 레이캐스트를 쏩니다.
+        // RotateFlashlightToMouse()에 의해 회전된 flashlight.transform.forward를 사용합니다.
+        Ray ray = new Ray(flashlight.transform.position, flashlight.transform.forward);
+        RaycastHit hit;
+
+        // 사거리 15m (원하시는 대로 조절 가능)
+        if (Physics.Raycast(ray, out hit, 15f))
+        {
+            
+            // 맞은 물체의 태그가 Monster라면
+            if (hit.collider.CompareTag("Monster"))
+            {
+                Debug.Log("눈알 맞음");
+                // EyeMonster 컴포넌트를 가져와서 대미지 함수 실행
+                EyeMonster monster = hit.collider.GetComponent<EyeMonster>();
+                if (monster != null)
+                {
+                    Debug.Log("눈알 데미지 맞음");
+                    monster.TakeLightDamage();
+                }
+            }
+        }
+
+        // 개발 중 확인용 노란 선 (Scene 뷰에서만 보임)
+        Debug.DrawRay(flashlight.transform.position, flashlight.transform.forward * 15f, Color.yellow);
     }
     void RotateFlashlightToMouse()
     {

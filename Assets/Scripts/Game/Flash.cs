@@ -33,9 +33,25 @@ public class Flash : MonoBehaviour
     // 인풋 시스템에서 호출 (OnFlashlight 액션)
     public void OnFlashlight(InputValue value)
     {
-       
+        if (PlayerState.ps.pState == PlayerState.State.Move ||
+            PlayerState.ps.pState == PlayerState.State.Attacked ||
+            PlayerState.ps.pState == PlayerState.State.GameOver ||
+            PlayerState.ps.pState == PlayerState.State.Sleep)
+        {
+            isFlashlightOn = false;
+            flashlight.enabled = false;
+            return; // 여기서 함수를 종료해버리면 아래쪽의 이동 로직이 실행 안 됨
+        }
         isFlashlightOn = value.isPressed;
         flashlight.enabled = isFlashlightOn;
+        if (isFlashlightOn)
+        {
+            PlayerState.ps.pFlash();
+        }
+        else
+        {
+            PlayerState.ps.pIdle();
+        }
     }
 
     // 인풋 시스템에서 호출 (OnCloseEyes 액션)
@@ -45,11 +61,26 @@ public class Flash : MonoBehaviour
         // 눈 감기 로직 (누르고 있으면 Alpha 1, 떼면 0)
         float targetAlpha = value.isPressed ? 1f : 0f;
         StopAllCoroutines();
+        if (targetAlpha == 1f)
+        {
+            PlayerState.ps.pSleep();
+        }
+        else if (targetAlpha == 0f) { 
+            PlayerState.ps.pIdle();
+        }
         StartCoroutine(FadeEyes(targetAlpha));
     }
 
     void Update()
     {
+        if (PlayerState.ps.pState == PlayerState.State.Move||
+            PlayerState.ps.pState == PlayerState.State.Attacked||
+            PlayerState.ps.pState == PlayerState.State.GameOver||
+            PlayerState.ps.pState == PlayerState.State.Sleep
+            )
+        {
+            return; // 여기서 함수를 종료해버리면 아래쪽의 이동 로직이 실행 안 됨
+        }
         Vector2 normalizedMouse = new Vector2((mouseInput.x / Screen.width)
             - 0.5f, (mouseInput.y / Screen.height) - 0.5f) * 2f;
 
@@ -62,20 +93,12 @@ public class Flash : MonoBehaviour
         {
             mouseDeadzone.x = 0;
         }
-        /*if (Mathf.Abs(normalizedMouse.y) > deadzone)
-        {
-            mouseDeadzone.y = (normalizedMouse.y > 0) ?
-                (normalizedMouse.y - deadzone) : (normalizedMouse.y + deadzone);
-        }
-        else
-        {
-            mouseDeadzone.y = 0;
-        }*/
+        
         yaw += mouseDeadzone.x * cameraSpeed * Time.deltaTime;
-        //pitch-=mouseDeadzone.y * cameraSpeed * Time.deltaTime;
+       
 
         yaw=Mathf.Clamp(yaw, yawLimit.x, yawLimit.y);
-        //pitch = Mathf.Clamp(pitch, pitchLimit.x, pitchLimit.y);
+        
 
         playerCamera.rotation = Quaternion.Euler(pitch, yaw, 0);
         RotateFlashlightToMouse();

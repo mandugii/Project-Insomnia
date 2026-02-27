@@ -18,10 +18,7 @@ public class PlayerState : MonoBehaviour
     {
         if (ps == null) ps = this;
     }
-    public State checkState()
-    {
-        return pState;
-    }
+    
     public void pIdle()
     {
         pState = State.Idle;
@@ -41,6 +38,7 @@ public class PlayerState : MonoBehaviour
     {
         pState = State.Sleep;
         Debug.Log("잠자기 상태");
+
     }
     public void pAttacked()
     {

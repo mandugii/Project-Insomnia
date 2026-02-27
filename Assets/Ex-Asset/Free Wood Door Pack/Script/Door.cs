@@ -33,7 +33,7 @@ namespace DoorScript
             if (isMonsterWatching)
             {
                 
-                if (PlayerState.ps.checkState() != PlayerState.State.Idle)
+                if (PlayerState.ps.pState != PlayerState.State.Idle)
                 {
                     isMonsterWatching = false; // 중복 실행 방지
                     StopAllCoroutines();
@@ -45,7 +45,7 @@ namespace DoorScript
 		{
             
             while (true) {
-                if (PlayerState.ps.checkState() == PlayerState.State.Sleep)
+                if (PlayerState.ps.pState == PlayerState.State.Sleep)
                 {
                     yield return new WaitForSeconds(1f);
                     continue;

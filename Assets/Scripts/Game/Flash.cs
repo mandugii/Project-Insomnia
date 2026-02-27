@@ -8,6 +8,7 @@ public class Flash : MonoBehaviour
     public Camera mainCam;
     public Light flashlight;
     public CanvasGroup eyeClosedOverlay; // 눈 감기 연출용 블랙 이미지
+    public Animator anim;
 
     [Header("회전 속도 설정")]
     public float cameraSpeed = 5f;
@@ -23,13 +24,17 @@ public class Flash : MonoBehaviour
     private float yaw;
     private float pitch;
     private bool isFlashlightOn;
+    private bool isFireOn;
     public void Start()
     {
         flashlight.enabled = false;
     }
     
     public void OnLook(InputValue value)=>mouseInput=value.Get<Vector2>();
-
+    public void OnFire(InputValue value)
+    {
+        isFireOn=value.isPressed;
+    }
     // 인풋 시스템에서 호출 (OnFlashlight 액션)
     public void OnFlashlight(InputValue value)
     {
@@ -102,12 +107,15 @@ public class Flash : MonoBehaviour
 
         playerCamera.rotation = Quaternion.Euler(pitch, yaw, 0);
         RotateFlashlightToMouse();
-        if (isFlashlightOn)
+        if (isFireOn)
         {
             
             CheckForMonsters();
+            isFireOn = false;
         }
     }
+   
+    
     void CheckForMonsters()
     {
         // 손전등의 현재 방향으로 레이캐스트를 쏩니다.
@@ -120,16 +128,17 @@ public class Flash : MonoBehaviour
         {
             
             // 맞은 물체의 태그가 Monster라면
-            if (hit.collider.CompareTag("Monster"))
+            if (hit.collider.CompareTag("Closet"))
             {
-                Debug.Log("눈알 맞음");
-                // EyeMonster 컴포넌트를 가져와서 대미지 함수 실행
-                EyeMonster monster = hit.collider.GetComponent<EyeMonster>();
-                if (monster != null)
-                {
-                    Debug.Log("눈알 데미지 맞음");
-                    monster.TakeLightDamage();
-                }
+                Debug.Log("옷장으로 이동");
+                PlayerState.ps.pMove();
+                anim.SetBool("moveToCloset", true);
+            }
+            else if (hit.collider.CompareTag("Window"))
+            {
+                Debug.Log("창문으로 이동");
+                PlayerState.ps.pMove();
+                anim.SetBool("moveToWindow", true);
             }
         }
 

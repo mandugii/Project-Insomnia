@@ -12,6 +12,10 @@ public class TickTock : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (PlayerState.ps.pState == PlayerState.State.Sleep)
+        {
+            return;
+        }
         currentTime += Time.deltaTime;
         if (currentTime > oneSecond)
         {

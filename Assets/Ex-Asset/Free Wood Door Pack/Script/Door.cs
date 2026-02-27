@@ -94,6 +94,7 @@ namespace DoorScript
         public void jumpScare()
         {
             PlayerState.ps.pAttacked();
+
             anim.SetTrigger("Attack");
         }
     }

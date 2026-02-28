@@ -16,10 +16,10 @@ public class CameraOpenDoor : MonoBehaviour {
 	void Update () {
 		RaycastHit hit;
 		if (Physics.Raycast (transform.position, transform.forward, out hit, DistanceOpen)) {
-				if (hit.transform.GetComponent<DoorScript.Door> ()) {
+				if (hit.transform.GetComponent<DoorScript.DoorMonster> ()) {
 				text.SetActive (true);
 				if (Input.GetKeyDown(KeyCode.E))
-					hit.transform.GetComponent<DoorScript.Door> ().OpenDoor();
+					hit.transform.GetComponent<DoorScript.DoorMonster> ().OpenDoor();
 			}else{
 				text.SetActive (false);
 			}

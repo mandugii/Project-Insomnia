@@ -16,7 +16,7 @@ public class Play : MonoBehaviour
     IEnumerator fadeOut()
     {
 
-        GameManager.gm.cutSceen();
+        
         panelGroup = panel.GetComponent<CanvasGroup>();
         float currentTime = 0f;
         while(currentTime < 1f)
@@ -26,6 +26,6 @@ public class Play : MonoBehaviour
             yield return null;
         }
         panelGroup.alpha = 1;
-        SceneManager.LoadScene("Prolog");
+        SceneManager.LoadScene("Insomnia");
     }
 }

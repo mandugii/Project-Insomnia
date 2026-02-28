@@ -8,7 +8,7 @@ namespace DoorScript
 	[RequireComponent(typeof(AudioSource))]
 
 
-	public class Door : MonoBehaviour
+	public class DoorMonster : MonoBehaviour
 	{
 		
 		public bool knock=false;
@@ -22,7 +22,7 @@ namespace DoorScript
 		{
 			asource = GetComponent<AudioSource>();
 			
-            StartCoroutine(randomKnock());
+            
 
         }
 
@@ -33,7 +33,7 @@ namespace DoorScript
             if (isMonsterWatching)
             {
                 
-                if (PlayerState.ps.pState != PlayerState.State.Idle)
+                if (PlayerState.ps.pState != PlayerState.State.Idle||Flash.isFlashlightOn)
                 {
                     isMonsterWatching = false; // 중복 실행 방지
                     StopAllCoroutines();
@@ -41,25 +41,23 @@ namespace DoorScript
                 }
             }
         }
+        public void StartAnim()
+        {
+            StartCoroutine(randomKnock());
+        }
         IEnumerator randomKnock()
 		{
             
             while (true) {
-                if (PlayerState.ps.pState == PlayerState.State.Sleep)
-                {
-                    yield return new WaitForSeconds(1f);
-                    continue;
-                }
-                float waitTime= UnityEngine.Random.Range(5f, 6f);
-				yield return new WaitForSeconds(waitTime);
+               
 				KnockDoor();
                 Debug.Log("노크 실행됨");
                 yield return new WaitForSeconds(7f);
 				OpenDoor();
-                yield return new WaitForSeconds(20f);
+                yield return new WaitForSeconds(10f);
 				CloseDoor();
 				yield return new WaitForSeconds(10f);
-
+                break;
             }
 		}
         public void StartWatching() // 문이 열리는 애니메이션의 '틈이 생기는' 프레임에 배치

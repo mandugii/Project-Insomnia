@@ -16,14 +16,14 @@ public class Flash : MonoBehaviour
 
     [Header("시야 제한")]
     public Vector2 yawLimit = new Vector2(-10, 70);   // 좌우 제한
-    //public Vector2 pitchLimit = new Vector2(-30, 30); // 상하 제한
+    
     public float deadzone = 0.4f;
 
     private Vector2 mouseDeadzone=Vector2.zero;
     private Vector2 mouseInput;
     private float yaw;
     private float pitch;
-    private bool isFlashlightOn;
+    public static bool isFlashlightOn;
     private bool isFireOn;
     public void Start()
     {
@@ -49,14 +49,7 @@ public class Flash : MonoBehaviour
         }
         isFlashlightOn = value.isPressed;
         flashlight.enabled = isFlashlightOn;
-        if (isFlashlightOn)
-        {
-            PlayerState.ps.pFlash();
-        }
-        else
-        {
-            PlayerState.ps.pIdle();
-        }
+       
     }
 
     // 인풋 시스템에서 호출 (OnCloseEyes 액션)
@@ -107,15 +100,29 @@ public class Flash : MonoBehaviour
 
         playerCamera.rotation = Quaternion.Euler(pitch, yaw, 0);
         RotateFlashlightToMouse();
-        if (isFireOn)
+        if(PlayerState.ps.pState == PlayerState.State.Idle ||
+            isFlashlightOn)
         {
-            
-            CheckForMonsters();
-            isFireOn = false;
+            if (isFireOn)
+            {
+
+                CheckForMonsters();
+                isFireOn = false;
+            }
         }
+        
     }
-   
-    
+
+    public void WindowToBed()
+    {
+        anim.SetBool("moveToWindow", false);
+        PlayerState.ps.pIdle();
+    }
+    public void ClosetToBed()
+    {
+        anim.SetBool("moveToCloset", false);
+        PlayerState.ps.pIdle();
+    }
     void CheckForMonsters()
     {
         // 손전등의 현재 방향으로 레이캐스트를 쏩니다.
